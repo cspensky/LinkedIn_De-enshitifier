@@ -1,38 +1,50 @@
-function removeLinkedInFeed() {
-    console.log('LinkedIn Feed Obliterator - Attempting to find and remove the feed...');
-    const feedAriaLabel = 'Main Feed';
-    const allSections = document.querySelectorAll('[aria-label]');
-    
-    let feedFound = false;
-    
-    allSections.forEach(section => {
-      if (section.getAttribute('aria-label') === feedAriaLabel) {
-        console.log('LinkedIn Feed Obliterator - Found the main feed section, removing it...');
-        section.remove();
-        feedFound = true;
+const feedSection = document.querySelector("main[aria-label='Main Feed']");
+
+function removeFeedCrap() {
+  // Remove promoted
+  const promotedSections = feedSection.querySelectorAll("[aria-hidden]");
+  promotedSections.forEach((section) => {
+    if (section.innerHTML.includes("Promoted")) {
+      let delSection =
+        section?.parentElement?.parentElement?.parentElement?.parentElement
+          ?.parentElement?.parentElement?.parentElement?.parentElement;
+      console.log(
+        "LinkedIn Feed Obliterator - Found promoted post, removing it..."
+      );
+      if (delSection) {
+        delSection.remove();
       }
-    });
-    
-    return feedFound;
+    }
+  });
+  const suggested = feedSection.querySelectorAll(
+    "span[class='update-components-header__text-view']"
+  );
+  suggested.forEach((section) => {
+    if (
+      section.innerHTML.includes("Suggested") ||
+      section.innerHTML.includes("Recommended") ||
+      section.innerHTML.includes("recommended")
+    ) {
+      let delSection =
+        section.parentElement.parentElement.parentElement.parentElement
+          .parentElement.parentElement;
+      console.log(
+        "LinkedIn Feed Obliterator - Found Suggested/Recommended post, removing it..."
+      );
+      delSection.remove();
+    }
+  });
 }
 
 // Attempt to remove the feed immediately in case the page is already loaded
-const feedRemoved = removeLinkedInFeed();
-let attempts = 0;
+removeFeedCrap();
 
-// If the feed was not removed, start periodic checks
+// Ref: https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver
+// Options for the observer (which mutations to observe)
+const config = { attributes: true, childList: true, subtree: true };
 
-console.log('Feed not found on initial try, starting periodic checks...');
-const intervalId = setInterval(() => {
-  const foundAndRemoved = removeLinkedInFeed();
-  attempts++;
-  if (foundAndRemoved) {
-    console.log('LinkedIn Feed Obliterator - Feed found and removed in later attempt.');
-    clearInterval(intervalId);
-  }
-  if (attempts > 10) {
-    console.log('LinkedIn Feed Obliterator - Feed not found after 10 attempts, giving up.');
-    clearInterval(intervalId);
-  }
-}, 1000); // Check every 1000 milliseconds (1 second)
-  
+// Create an observer instance linked to the callback function
+const observer = new MutationObserver(removeFeedCrap);
+
+// Start observing the target node for configured mutations
+observer.observe(feedSection, config);
