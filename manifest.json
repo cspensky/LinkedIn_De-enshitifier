@@ -1,8 +1,8 @@
 {
     "manifest_version": 3,
-    "name": "LinkedIn Feed Obliterator",
+    "name": "LinkedIn - De-Enshitifier",
     "version": "1.0",
-    "description": "Removes the LinkedIn feed from the homepage.",
+    "description": "Removes LinkedIn ads and promoted posts.",
     "permissions": ["activeTab", "storage"],
     "action": {
       "default_icon": {
@@ -13,7 +13,7 @@
     },
     "content_scripts": [
       {
-        "matches": ["*://www.linkedin.com/feed/*"],
+        "matches": ["*://www.linkedin.com/*"],
         "js": ["content.js"]
       }
     ],
